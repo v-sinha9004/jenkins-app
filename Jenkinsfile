@@ -69,6 +69,20 @@ pipeline {
             }
         }
 
+        stage('Deploy') {
+            agent {
+                docker {
+                    image 'node:24-slim'
+                    reuseNode true
+                }
+            }
+            steps {
+                sh'''
+                    npm install -g netlify-cli
+                    netlify --version
+                '''
+            }
+        }
 
     }
 
