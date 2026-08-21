@@ -5,9 +5,31 @@ pipeline {
         NETLIFY_SITE_ID = '16f590e9-20e2-4c3b-b4e6-0f7f2138637a'
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')
         REACT_APP_VERSION = "1.2.$BUILD_ID"
+        AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
+        AWS_REGION = 'ap-south-1'
     }
 
     stages {
+
+        stage('AWS') {
+            agent {
+                docker {
+                    image 'amazon/aws-cli'
+                    args "--entrypoint=''"
+                }
+            }
+
+            steps {
+                withCredentials([
+                    usernamePassword(credentialsId: 'my-aws', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+                    sh '''
+                        aws --version
+                    '''
+                }
+            }
+        }
 
         stage('Build') {
             agent {
